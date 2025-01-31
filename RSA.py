@@ -1,3 +1,6 @@
+# RSA Cyptosystem Project 1
+# Aiden Cary, Nathan Wetherington, Dalton Gorham
+
 # Imports
 import random
 import math
@@ -11,7 +14,7 @@ def is_prime(n):
     for i in range(2, int(math.sqrt(n)) + 1):
         # If n has any factors other than 1 and itself, at least one of them must be <= sqrt(n)
         # If n is divisible by any number in this range, it is not a prime number
-        if n % i == 0:  # Corrected modulo check
+        if n % i == 0:
             return False
     return True  # Return True only if no divisors were found
 
@@ -25,7 +28,7 @@ def generate_prime(start = 100, end = 1000):
         if is_prime(p):
             return p
 
-# Helper functoin for computing the modular inverse using the Extended Euclidean Algorithm
+# Helper function for computing the modular inverse using the Extended Euclidean Algorithm
 # egcd finds the greatest common divisor of two numbers, a and b, while also computing coefficients x and y
 # such that ax + by = gcd(a, b)
 def modular_inverse(e, phi):
@@ -35,7 +38,7 @@ def modular_inverse(e, phi):
         if a == 0:
             return b, 0, 1 # Breaks out of recursion
         g, x, y = egcd(b % a, a) # Recursive statement
-        # b // a is floor division that returns the integer qoutient, discarding the remainder
+        # b // a is floor division that returns the integer quotient, discarding the remainder
         return g, y, - (b // a) * x, x
     # The underscore is a placeholder for y since it is not used
     g, x, _  = egcd(e, phi)
@@ -59,7 +62,7 @@ def generate_keys():
 
     # e is the public exponent chosen randomly such that...
     # 1 < e < phi && gcd(e, phi) = 1 making e coprime to phi
-    # Coprime means that two onumber have no common factor other than 1
+    # Coprime means that two numbersb have no common factor other than 1
     e = random.randint(2, phi - 1)
     while gcd(e, phi) != 1:
         e = random.randint(2, phi - 1)
@@ -81,7 +84,7 @@ def user_type_menu():
 def main():
     # Generate keys
     public_key, private_key = generate_keys()
-    # Create arrays for messages and signature to hold input
+    # Create arrays for messages and signatures to hold input
     messages = []
     signatures = []
 
