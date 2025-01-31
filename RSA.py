@@ -90,7 +90,8 @@ def main():
 
     print("RSA keys have been generated.")
 
-    while True:
+    # while True:
+        # Print menu and return the user input into user-type
         user_type = user_type_menu()
 
 
