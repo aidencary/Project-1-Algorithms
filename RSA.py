@@ -4,7 +4,7 @@
 # Imports
 import random
 import math
-from math import gcd # gcd = greatest common denominator
+from math import gcd # gcd = greatest common divisor
 
 # Helper function to check if a number is prime
 # Returns true if prime and false if not prime
@@ -39,7 +39,7 @@ def modular_inverse(e, phi):
             return b, 0, 1 # Breaks out of recursion
         g, x, y = egcd(b % a, a) # Recursive statement
         # b // a is floor division that returns the integer quotient, discarding the remainder
-        return g, y, - (b // a) * x, x
+        return g, y, x - (b // a) * y
     # The underscore is a placeholder for y since it is not used
     g, x, _  = egcd(e, phi)
     return x % phi if g == 1 else None
@@ -62,12 +62,16 @@ def generate_keys():
 
     # e is the public exponent chosen randomly such that...
     # 1 < e < phi && gcd(e, phi) = 1 making e coprime to phi
-    # Coprime means that two numbersb have no common factor other than 1
+    # Coprime means that two numbers have no common factor other than 1
     e = random.randint(2, phi - 1)
     while gcd(e, phi) != 1:
         e = random.randint(2, phi - 1)
 
     d = modular_inverse(e, phi)
+
+    if d == e:
+        print(f"Warning: d and e are the same ({d}). Regenerating keys...")
+        return generate_keys()
 
     return (e, key_n), (d, key_n)
 
@@ -77,22 +81,76 @@ def user_type_menu():
     print("1. A public user")
     print("2. The owner of the keys")
     print("3. Exit program")
-    input = ("Enter your choice: ")
-    return input
+    return input("Enter your choice: ")
+
+# THIS NEEDS CHANGED: It currently does not work
+def encode_message(message):
+    return int.from_bytes(message.encode('utf-8', 'big'))
+
+
+# THIS NEEDS CHANGED: It currently does not work
+def decode_message(encrypted_message):
+    byte_length = (encrypted_message.bit_length() + 7) // 8
+    decoded_message = encrypted_message.to_bytes(byte_length, 'big')
+    return decoded_message.decode('utf-8')
+
+
+
+def encrypt_message(public_key, message):
+    e, n = public_key
+
+    message_int = encode_message(message)
+
+    encrypted_message = pow(message_int, e, n)
+
+    return encrypted_message
+
+
+def decrypt_message(private_key, encrypted_message):
+    d, n = private_key
+    decrypted_message = pow(encrypted_message, d, n)
+    return decode_message(decrypted_message)
+
+
+def public_user_menu():
+    print("1: Send an encrypted message")
+    print("2: Authenticate a digital signature")
+    print("3: Exit")
+    return int(input("Enter your choice: "))
+
 
 
 def main():
-    # Generate keys
     public_key, private_key = generate_keys()
-    # Create arrays for messages and signatures to hold input
-    messages = []
-    signatures = []
-
-    print("RSA keys have been generated.")
-
-    # while True:
-        # Print menu and return the user input into user-type
-        user_type = user_type_menu()
+    print(f"Public Key: {public_key}")
+    print(f"Private Key: {private_key}")
 
 
     
+
+    while True:
+        user_input = user_type_menu()
+
+        if user_input == '1':
+           user_choice = public_user_menu()
+
+           if user_choice == 1:
+                message = input("Enter a message: ")
+                encrypted_message = encrypt_message(public_key, message)
+                print(f"Encrypted Message: {encrypted_message}")
+                decrypted_message = decrypt_message(private_key, encrypted_message)
+                print(f"Decrypted Message: {decrypted_message}")
+        else: break
+
+        
+            
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    main()
