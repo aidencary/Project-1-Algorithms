@@ -106,7 +106,7 @@ def public_user_menu():
         return public_user_menu() 
 
 # Handles public user menu options
-def handle_public_user_menu(public_key, message):
+def handle_public_user_menu(public_key, message, signature):
     while True:
         user_choice = public_user_menu()
         if user_choice == 1:
@@ -118,9 +118,9 @@ def handle_public_user_menu(public_key, message):
         elif user_choice == 2:
             #print("Digital signature authentication feature is not yet implemented.")
             # Add implementation later
-            if message is None:
+            if signature is None:
                 print("There are no signature to authenticate")
-            else:
+            elif verify_signature(message, signature, public_key ):
                 print("The following messages are available:")
                 print(f"1. {message}")
         elif user_choice == 3:
@@ -162,7 +162,7 @@ def handle_key_owner(private_key, encrypted_message):
         elif owner_choice == 4:
             print ("Implementation has not been added")
         elif owner_choice == 5:
-            return message
+            return (message, signature)
 
             
 
@@ -192,14 +192,16 @@ def main():
 
     # Sets encrypted message to None so key owner menu can be accessed without their being a message
     encrypted_message = None
-
+    message = None
+    signature = None
+    
     while True:
         user_input = user_type_menu()
         if user_input == '1':
-           encrypted_message = handle_public_user_menu(public_key, message)
+           encrypted_message = handle_public_user_menu(public_key, message, signature)
         elif user_input == '2':
             print("Owner of the keys functionality is not yet implemented.")
-            message = handle_key_owner(private_key, encrypted_message)
+            message, signature = handle_key_owner(private_key, encrypted_message)
         elif user_input == '3':
             print("Exiting program. Goodbye!")
             break
