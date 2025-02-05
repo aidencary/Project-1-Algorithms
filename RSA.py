@@ -190,7 +190,7 @@ def main():
     print(f"Public Key: {public_key}")
     print(f"Private Key: {private_key}")
 
-    # Sets encrypted message to None so key owner menu can be accessed without their being a message
+    # Sets encrypted message, message, and signature to None so either menu can be accessed without the variables they return
     encrypted_message = None
     message = None
     signature = None
