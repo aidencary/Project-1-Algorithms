@@ -1,98 +1,212 @@
 # RSA Cyptosystem Project 1
 # Aiden Cary, Nathan Wetherington, Dalton Gorham
-
-# Imports
-import random
 import math
-from math import gcd # gcd = greatest common denominator
+import random
 
-# Helper function to check if a number is prime
-# Returns true if prime and false if not prime
-def is_prime(n):
-    if (n < 2):  # If a number is less than 2, it cannot be prime
-        return False
-    for i in range(2, int(math.sqrt(n)) + 1):
-        # If n has any factors other than 1 and itself, at least one of them must be <= sqrt(n)
-        # If n is divisible by any number in this range, it is not a prime number
-        if n % i == 0:
-            return False
-    return True  # Return True only if no divisors were found
+def test_prime(p = 137):
+    '''Test if p is prime with Fermat\'s little theorem\n'''
+    t = True
+    for i in range(1, p):
+        if pow(i, p-1, p) != 1:
+            t = False
+            break
+        
+    return t
 
-# Helper function for generating a random prime number
-# Returns a prime number
-def generate_prime(start = 100, end = 1000):
-    # While numbers generated are not prime, loop again
-     while True:
-        # Generates a random number between 100 and 1000
-        p = random.randint(start, end)
-        if is_prime(p):
-            return p
 
-# Helper function for computing the modular inverse using the Extended Euclidean Algorithm
-# egcd finds the greatest common divisor of two numbers, a and b, while also computing coefficients x and y
-# such that ax + by = gcd(a, b)
+def generate_prime(min, max):
+    prime = random.randint(min, max)
+
+    while not test_prime(prime):
+        prime = random.randint(min, max)
+    return prime
+
+
+
+# Function to find an integer 'e' that is relatively prime to 'phi'
+def find_relatively_prime(phi):
+    # Start with a small number greater than 1
+    e = 2
+    # Keep increasing e until we find one that is coprime with phi
+    while math.gcd(e, phi) != 1:
+        e += 1
+    return e
+
+
+
 def modular_inverse(e, phi):
-    # egcd is a recursive function that checks if a == 0, it returns (b, 0, 1) since the GCD of 0 and b, is b
-    # else it recurses with b % a and a, computing coefficients x and y using the returned values
-    def egcd(a, b):
-        if a == 0:
-            return b, 0, 1 # Breaks out of recursion
-        g, x, y = egcd(b % a, a) # Recursive statement
-        # b // a is floor division that returns the integer quotient, discarding the remainder
-        return g, y, - (b // a) * x, x
-    # The underscore is a placeholder for y since it is not used
-    g, x, _  = egcd(e, phi)
-    return x % phi if g == 1 else None
+    # Function to compute the greatest common divisor (GCD) using the Euclidean Algorithm
+    def extended_gcd(a, b):
+        if b == 0:
+            return a, 1, 0
+        gcd, x1, y1 = extended_gcd(b, a % b)
+        x = y1
+        y = x1 - (a // b) * y1
+        return gcd, x, y
 
-# Generates the RSA keys for encryption
-def generate_keys():
-    # Generate keys p and q
-    key_p = generate_prime() # Public key
-    key_q = generate_prime() # Private key
+    # Compute the GCD of e and phi
+    gcd, x, y = extended_gcd(e, phi)
 
-    # While q is equal to p, generate a new prime number for q
-    while key_q == key_p:
-        key_q = generate_prime()
+    # If the GCD is 1, then e and phi are coprime, and the modular inverse exists
+    if gcd == 1:
+        # Ensure the modular inverse is positive
+        return x % phi
+    else:
+        # If GCD is not 1, no modular inverse exists
+        return None
+    
 
-    # key_n is the product of p and q
-    key_n = (key_p * key_q)
+# Encrypts the message using the public key
+def encrypt_message(public_key, message):
+    e, n = public_key
+    # Convert the message to a list of integers (ASCII values)
+    message_encoded = [ord(c) for c in message]
+    # Encrypt each character using RSA formula: c = m^e % n
+    encrypted_message = [pow(m, e, n) for m in message_encoded]
+    return encrypted_message
 
-    # phi is Euler's toient function and helps determine the valid values for the coprime e
-    phi = (key_p - 1) * (key_q - 1)
+# Decrypts the message using the private key
+def decrypt_message(private_key, encrypted_message):
+    d, n = private_key
+    # Decrypt each character using RSA formula: m = c^d % n
+    decrypted_message = [pow(c, d, n) for c in encrypted_message]
+    # Convert the decrypted message back to characters
+    return "".join(chr(m) for m in decrypted_message)
 
-    # e is the public exponent chosen randomly such that...
-    # 1 < e < phi && gcd(e, phi) = 1 making e coprime to phi
-    # Coprime means that two numbersb have no common factor other than 1
-    e = random.randint(2, phi - 1)
-    while gcd(e, phi) != 1:
-        e = random.randint(2, phi - 1)
+# Sign a message
+def sign_message(message, private_key):
+    d, n = private_key
+    hashed = sum(ord(char) for char in message)
+    return pow(hashed, d, n)
 
-    d = modular_inverse(e, phi)
+# Verify signature
+def verify_signature(message, signature, public_key):
+    e, n = public_key
+    hashed = sum(ord(char) for char in message)
+    return hashed == pow(signature, e, n)
 
-    return (e, key_n), (d, key_n)
-
-# Prints the user selection menu
+# Prints the user selection menu and returns input
 def user_type_menu():
     print("\nPlease select your user type:")
     print("1. A public user")
     print("2. The owner of the keys")
     print("3. Exit program")
-    input = ("Enter your choice: ")
-    return input
+    return input("Enter your choice: ")
+
+# Prints the public user menu and returns input
+def public_user_menu():
+    print("\nPublic User Options:")
+    print("1: Send an encrypted message")
+    print("2: Authenticate a digital signature")
+    print("3: Exit")
+    try:
+        return int(input("Enter your choice: "))
+    except ValueError:
+        print("Invalid input. Please enter 1, 2, or 3.")
+        return public_user_menu() 
+
+# Handles public user menu options
+def handle_public_user_menu(public_key, message):
+    while True:
+        user_choice = public_user_menu()
+        if user_choice == 1:
+            input_msg = input("Enter a message: ")
+
+            encrypted_message = encrypt_message(public_key, input_msg)
+            print("Message encrypted and sent.")
+            
+        elif user_choice == 2:
+            #print("Digital signature authentication feature is not yet implemented.")
+            # Add implementation later
+            if message is None:
+                print("There are no signature to authenticate")
+            else:
+                print("The following messages are available:")
+                print(f"1. {message}")
+        elif user_choice == 3:
+            print("Exiting public user menu.")
+            return encrypted_message
+        else:
+            print("Invalid option. Please try again.")
+
+# Prints the owner menu and returns the input
+def owner_menu():
+    print("\nAs the owner of the keys, what would you like to do?")
+    print("1. Decrypt a received message")
+    print("2. Digitally sign a message")
+    print("3. Show the keys")
+    print("4. Generate a new set of keys")
+    print("5. Exit")
+    try:
+        return int(input("Enter your choice: "))
+    except ValueError:
+        print("Invalid input. Please enter 1, 2, or 3.")
+        return owner_menu()
+
+
+def handle_key_owner(private_key, encrypted_message):
+    while True:
+        owner_choice = owner_menu()
+        if owner_choice == 1:
+            if encrypted_message is None:
+                print("No message to decrypt.")
+            else:
+                decrypted_message = decrypt_message(private_key, encrypted_message)
+                print(f"Decrypted message: {decrypted_message}")
+        elif owner_choice == 2:
+            message = input("Enter a message: ")
+            signature = sign_message(message, private_key)
+            print("Message signed and sent")
+        elif owner_choice == 3:
+            print("Implementation has not been added.")
+        elif owner_choice == 4:
+            print ("Implementation has not been added")
+        elif owner_choice == 5:
+            return message
+
+            
+
+
 
 
 def main():
-    # Generate keys
-    public_key, private_key = generate_keys()
-    # Create arrays for messages and signatures to hold input
-    messages = []
-    signatures = []
-
-    print("RSA keys have been generated.")
-
-    # while True:
-        # Print menu and return the user input into user-type
-        user_type = user_type_menu()
-
-
     
+    # TODO - Implement the rest of handle_key_owner options and the digital signature functionality
+    p = generate_prime(100, 5000)
+    q = generate_prime(100, 5000)
+
+    n = p * q
+
+    phi = (p - 1) * (q - 1)
+
+    e = find_relatively_prime(phi)
+
+
+    d = modular_inverse(e, phi)
+
+    public_key = (e, n)
+    private_key = (d, n)
+
+    print(f"Public Key: {public_key}")
+    print(f"Private Key: {private_key}")
+
+    # Sets encrypted message to None so key owner menu can be accessed without their being a message
+    encrypted_message = None
+
+    while True:
+        user_input = user_type_menu()
+        if user_input == '1':
+           encrypted_message = handle_public_user_menu(public_key, message)
+        elif user_input == '2':
+            print("Owner of the keys functionality is not yet implemented.")
+            message = handle_key_owner(private_key, encrypted_message)
+        elif user_input == '3':
+            print("Exiting program. Goodbye!")
+            break
+    
+
+
+
+
+if __name__ == "__main__":
+    main()
