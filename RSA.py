@@ -106,12 +106,12 @@ def public_user_menu():
         return public_user_menu() 
 
 # Handles public user menu options
-def handle_public_user_menu(public_key, message, signature):
+def handle_public_user_menu(public_key, encrypted_message, message, signature):
+    
     while True:
         user_choice = public_user_menu()
         if user_choice == 1:
             input_msg = input("Enter a message: ")
-
             encrypted_message = encrypt_message(public_key, input_msg)
             print("Message encrypted and sent.")
             
@@ -225,7 +225,7 @@ def main():
     while True:
         user_input = user_type_menu()
         if user_input == '1':
-           encrypted_message = handle_public_user_menu(public_key, message, signature)
+           encrypted_message = handle_public_user_menu(public_key, encrypted_message, message, signature)
         elif user_input == '2':
             message, signature, public_key, private_key = handle_key_owner(public_key, private_key, encrypted_message)
         elif user_input == '3':
