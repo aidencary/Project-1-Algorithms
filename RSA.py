@@ -166,6 +166,9 @@ def handle_key_owner(public_key, private_key, encrypted_message):
         elif owner_choice == 4:
             print ("Generating new keys...")
             public_key, private_key = generate_keys()
+            print(f"Public Key: {public_key}")
+            print(f"Private Key: {private_key}")
+            print("New keys generated!")
         elif owner_choice == 5:
             if message is not None:
                 return (message, signature, public_key, private_key)
@@ -187,9 +190,6 @@ def generate_keys():
 
     public_key = (e, n)
     private_key = (d, n)
-
-    print(f"Public Key: {public_key}")
-    print(f"Private Key: {private_key}")
 
     return public_key, private_key
 
