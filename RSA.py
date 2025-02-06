@@ -108,6 +108,8 @@ def public_user_menu():
 # Handles public user menu options
 def handle_public_user_menu(public_key, encrypted_message, message, signature):
     
+def handle_public_user_menu(public_key, message, signature):
+    encrypt_message = None
     while True:
         user_choice = public_user_menu()
         if user_choice == 1:
@@ -148,6 +150,8 @@ def owner_menu():
 
 
 def handle_key_owner(public_key, private_key, encrypted_message):
+    message = None
+    signature = None
     while True:
         owner_choice = owner_menu()
         if owner_choice == 1:
