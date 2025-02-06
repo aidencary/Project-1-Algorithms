@@ -175,8 +175,13 @@ def handle_key_owner(private_key, public_key, encrypted_message, message, signat
             if encrypted_message is None:
                 print("\nNo message to decrypt.")
             else:
-                decrypted_message = decrypt_message(private_key, encrypted_message)
-                print(f"\nDecrypted message: {decrypted_message}")
+                length_of_encrypted_message = len(encrypted_message)
+                print("\nThe following messages are available:")
+                print(f"1. (length = {length_of_encrypted_message})")
+                choice = int(input("Enter your choice: "))
+                if choice == 1:
+                    decrypted_message = decrypt_message(private_key, encrypted_message)
+                    print(f"\nDecrypted message: {decrypted_message}")
         elif owner_choice == 2:
             message = input("Enter a message: ")
             signature = sign_message(message, private_key)
@@ -204,7 +209,7 @@ def generate_keys():
     n = p * q
 
     phi = (p - 1) * (q - 1)
-    print(phi)
+
     e = find_relatively_prime(phi)
 
     d = modular_inverse(e, phi)
@@ -217,17 +222,17 @@ def generate_keys():
 
 
 def main():
+    # Generate public and private keys
     public_key, private_key = generate_keys()
-
-    print(f"Public Key: {public_key}")
-    print(f"Private Key: {private_key}")
 
     # Sets encrypted message, message, and signature to None so either menu can be accessed without the variables they return
     encrypted_message = None
     message = None
     signature = None
     message = None
+
     print("\nWelcome to the RSA Cryptosystem!")
+    # Main loop
     while True:
         user_input = user_type_menu()
         if user_input == '1':
