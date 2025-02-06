@@ -87,61 +87,73 @@ def verify_signature(message, signature, public_key):
 
 # Prints the user selection menu and returns input
 def user_type_menu():
+    print("\n=====================================")
+    print("\nWelcome to the RSA Cryptosystem!")
     print("\nPlease select your user type:")
     print("1. A public user")
     print("2. The owner of the keys")
     print("3. Exit program")
-    return input("Enter your choice: ")
+    choice = input("Enter your choice: ")
+    if choice in ['1', '2', '3']:
+        return choice
+    else:
+        print("\nInvalid input. Please enter 1, 2, or 3.")
+        return user_type_menu()
+
 
 # Prints the public user menu and returns input
 def public_user_menu():
-    print("\nPublic User Options:")
+    print("\n=====================================")
+    print("\nPublic User Menu:")
+    print("What would you like to do?")
     print("1: Send an encrypted message")
     print("2: Authenticate a digital signature")
-    print("3: Exit")
-    try:
-        return int(input("Enter your choice: "))
-    except ValueError:
-        print("Invalid input. Please enter 1, 2, or 3.")
-        return public_user_menu() 
+    print("3: Return to main menu")
+    choice = input("Enter your choice: ")
+    
+    if choice in ['1', '2', '3']:
+        return int(choice)
+    else:
+        print("\nInvalid input. Please enter 1, 2, or 3.")
+        return public_user_menu()
 
 # Handles public user menu options
-def handle_public_user_menu(public_key, encrypted_message, message, signature):
     
 def handle_public_user_menu(public_key, message, signature):
+    encrypted_message = None
     encrypt_message = None
     while True:
         user_choice = public_user_menu()
         if user_choice == 1:
             input_msg = input("Enter a message: ")
             encrypted_message = encrypt_message(public_key, input_msg)
-            print("Message encrypted and sent.")
+            print("\nMessage encrypted and sent.")
             
         elif user_choice == 2:
-            #print("Digital signature authentication feature is not yet implemented.")
-            # Add implementation later
             if signature is None:
-                print("There are no signature to authenticate")
+                print("\nThere are no signature to authenticate")
             elif verify_signature(message, signature, public_key ):
-                print("The following messages are available:")
+                print("\nThe following messages are available:")
                 print(f"1. {message}")
         elif user_choice == 3:
-            print("Exiting public user menu.")
+            print("\nExiting public user menu.")
             if encrypted_message is not None:
                 return encrypted_message
             else:
                 return None
         else:
-            print("Invalid option. Please try again.")
+            print("\nInvalid input. Please enter 1, 2, or 3.")
 
 # Prints the owner menu and returns the input
 def owner_menu():
-    print("\nAs the owner of the keys, what would you like to do?")
+    print("\n=====================================")
+    print("\nKey Owner Menu:")
+    print("As the owner of the keys, what would you like to do?")
     print("1. Decrypt a received message")
     print("2. Digitally sign a message")
     print("3. Show the keys")
     print("4. Generate a new set of keys")
-    print("5. Exit")
+    print("5. Return to main menu")
     try:
         return int(input("Enter your choice: "))
     except ValueError:
@@ -149,23 +161,23 @@ def owner_menu():
         return owner_menu()
 
 
-def handle_key_owner(public_key, private_key, encrypted_message):
+def handle_key_owner(private_key, public_key, encrypted_message):
     message = None
     signature = None
     while True:
         owner_choice = owner_menu()
         if owner_choice == 1:
             if encrypted_message is None:
-                print("No message to decrypt.")
+                print("\nNo message to decrypt.")
             else:
                 decrypted_message = decrypt_message(private_key, encrypted_message)
-                print(f"Decrypted message: {decrypted_message}")
+                print(f"\nDecrypted message: {decrypted_message}")
         elif owner_choice == 2:
             message = input("Enter a message: ")
             signature = sign_message(message, private_key)
-            print("Message signed and sent")
+            print("\nMessage signed and sent")
         elif owner_choice == 3:
-            print(f"Public Key: {public_key}")
+            print(f"\nPublic Key: {public_key}")
             print(f"Private Key: {private_key}")
         elif owner_choice == 4:
             print ("Generating new keys...")
@@ -200,26 +212,19 @@ def generate_keys():
 
 
 def main():
-    
-    # TODO - Implement the rest of handle_key_owner options and the digital signature functionality
-    '''
     p = generate_prime(100, 5000)
     q = generate_prime(100, 5000)
-
     n = p * q
-
     phi = (p - 1) * (q - 1)
-
     e = find_relatively_prime(phi)
 
 
     d = modular_inverse(e, phi)
-
     public_key = (e, n)
     private_key = (d, n)
-'''
-    # Set public and private keys
-    public_key, private_key = generate_keys()
+
+    print(f"Public Key: {public_key}")
+    print(f"Private Key: {private_key}")
 
     # Sets encrypted message, message, and signature to None so either menu can be accessed without the variables they return
     encrypted_message = None
@@ -231,7 +236,9 @@ def main():
         if user_input == '1':
            encrypted_message = handle_public_user_menu(public_key, encrypted_message, message, signature)
         elif user_input == '2':
-            message, signature, public_key, private_key = handle_key_owner(public_key, private_key, encrypted_message)
+            result = handle_key_owner(private_key, public_key, encrypted_message)
+            if result is not None:
+                message, signature = result
         elif user_input == '3':
             print("Exiting program. Goodbye!")
             break
