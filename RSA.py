@@ -3,6 +3,8 @@
 import math
 import random
 
+
+# This function was from Dr. Hu's slides
 def test_prime(p = 137):
     '''Test if p is prime with Fermat\'s little theorem\n'''
     t = True
@@ -88,7 +90,6 @@ def verify_signature(message, signature, public_key):
 # Prints the user selection menu and returns input
 def user_type_menu():
     print("\n=====================================")
-    print("\nWelcome to the RSA Cryptosystem!")
     print("\nPlease select your user type:")
     print("1. A public user")
     print("2. The owner of the keys")
@@ -119,9 +120,8 @@ def public_user_menu():
 
 # Handles public user menu options
     
-def handle_public_user_menu(public_key, message, signature):
-    encrypted_message = None
-    encrypt_message = None
+def handle_public_user_menu(public_key, encrypted_message, message, signature):
+    
     while True:
         user_choice = public_user_menu()
         if user_choice == 1:
@@ -132,9 +132,15 @@ def handle_public_user_menu(public_key, message, signature):
         elif user_choice == 2:
             if signature is None:
                 print("\nThere are no signature to authenticate")
-            elif verify_signature(message, signature, public_key ):
+            else:
                 print("\nThe following messages are available:")
                 print(f"1. {message}")
+                choice = int(input("Enter your choice: "))
+                if choice == 1:
+                    if verify_signature(message, signature, public_key):
+                        print("\nSignature is valid.")
+                    else:
+                        print("\nSignature is not valid.")
         elif user_choice == 3:
             print("\nExiting public user menu.")
             if encrypted_message is not None:
@@ -161,9 +167,8 @@ def owner_menu():
         return owner_menu()
 
 
-def handle_key_owner(private_key, public_key, encrypted_message):
-    message = None
-    signature = None
+def handle_key_owner(private_key, public_key, encrypted_message, message, signature):
+    
     while True:
         owner_choice = owner_menu()
         if owner_choice == 1:
@@ -180,13 +185,19 @@ def handle_key_owner(private_key, public_key, encrypted_message):
             print(f"\nPublic Key: {public_key}")
             print(f"Private Key: {private_key}")
         elif owner_choice == 4:
-            print ("Generating new keys...")
-            public_key, private_key = generate_keys()
+            
+            print("\nWarning: You have an encrypted message that will be lost if you generate new keys.")
+            confirm = input("Are you sure you want to generate new keys? (y/n): ")
+            if confirm.lower() == 'y':
+                print ("Generating new keys...")
+                public_key, private_key = generate_keys()
+                encrypted_message = None # Reset encrypted message
+            
         elif owner_choice == 5:
-            if message is not None:
-                return (message, signature, public_key, private_key)
-            else:
-                return None
+           
+            return (message, signature, public_key, private_key)
+        else:
+                print("\nInvalid input.")
 
             
 def generate_keys():
@@ -196,32 +207,20 @@ def generate_keys():
     n = p * q
 
     phi = (p - 1) * (q - 1)
-
+    print(phi)
     e = find_relatively_prime(phi)
 
     d = modular_inverse(e, phi)
 
     public_key = (e, n)
     private_key = (d, n)
-
-    print(f"Public Key: {public_key}")
-    print(f"Private Key: {private_key}")
 
     return public_key, private_key
 
 
 
 def main():
-    p = generate_prime(100, 5000)
-    q = generate_prime(100, 5000)
-    n = p * q
-    phi = (p - 1) * (q - 1)
-    e = find_relatively_prime(phi)
-
-
-    d = modular_inverse(e, phi)
-    public_key = (e, n)
-    private_key = (d, n)
+    public_key, private_key = generate_keys()
 
     print(f"Public Key: {public_key}")
     print(f"Private Key: {private_key}")
@@ -230,15 +229,18 @@ def main():
     encrypted_message = None
     message = None
     signature = None
-    
+    message = None
+    print("\nWelcome to the RSA Cryptosystem!")
     while True:
         user_input = user_type_menu()
         if user_input == '1':
            encrypted_message = handle_public_user_menu(public_key, encrypted_message, message, signature)
         elif user_input == '2':
-            result = handle_key_owner(private_key, public_key, encrypted_message)
+            result = handle_key_owner(private_key, public_key, encrypted_message, message, signature)
             if result is not None:
-                message, signature = result
+                message, signature, public_key, private_key  = result
+                print(f"Public Key: {public_key}")
+                print(f"Private Key: {private_key}")
         elif user_input == '3':
             print("Exiting program. Goodbye!")
             break
