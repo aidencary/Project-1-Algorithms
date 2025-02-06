@@ -147,7 +147,7 @@ def owner_menu():
         return owner_menu()
 
 
-def handle_key_owner(private_key, encrypted_message):
+def handle_key_owner(public_key, private_key, encrypted_message):
     while True:
         owner_choice = owner_menu()
         if owner_choice == 1:
@@ -161,23 +161,44 @@ def handle_key_owner(private_key, encrypted_message):
             signature = sign_message(message, private_key)
             print("Message signed and sent")
         elif owner_choice == 3:
-            print("Implementation has not been added.")
+            print(f"Public Key: {public_key}")
+            print(f"Private Key: {private_key}")
         elif owner_choice == 4:
-            print ("Implementation has not been added")
+            print ("Generating new keys...")
+            public_key, private_key = generate_keys()
         elif owner_choice == 5:
-            if message is not None and signature is not None:
-                return (message, signature)
+            if message is not None:
+                return (message, signature, public_key, private_key)
             else:
                 return None
 
             
+def generate_keys():
+    p = generate_prime(100, 5000)
+    q = generate_prime(100, 5000)
 
+    n = p * q
+
+    phi = (p - 1) * (q - 1)
+
+    e = find_relatively_prime(phi)
+
+    d = modular_inverse(e, phi)
+
+    public_key = (e, n)
+    private_key = (d, n)
+
+    print(f"Public Key: {public_key}")
+    print(f"Private Key: {private_key}")
+
+    return public_key, private_key
 
 
 
 def main():
     
     # TODO - Implement the rest of handle_key_owner options and the digital signature functionality
+    '''
     p = generate_prime(100, 5000)
     q = generate_prime(100, 5000)
 
@@ -192,9 +213,9 @@ def main():
 
     public_key = (e, n)
     private_key = (d, n)
-
-    print(f"Public Key: {public_key}")
-    print(f"Private Key: {private_key}")
+'''
+    # Set public and private keys
+    public_key, private_key = generate_keys()
 
     # Sets encrypted message, message, and signature to None so either menu can be accessed without the variables they return
     encrypted_message = None
@@ -206,8 +227,7 @@ def main():
         if user_input == '1':
            encrypted_message = handle_public_user_menu(public_key, message, signature)
         elif user_input == '2':
-            print("Owner of the keys functionality is not yet implemented.")
-            message, signature = handle_key_owner(private_key, encrypted_message)
+            message, signature, public_key, private_key = handle_key_owner(public_key, private_key, encrypted_message)
         elif user_input == '3':
             print("Exiting program. Goodbye!")
             break
