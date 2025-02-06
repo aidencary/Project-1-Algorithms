@@ -125,7 +125,10 @@ def handle_public_user_menu(public_key, message, signature):
                 print(f"1. {message}")
         elif user_choice == 3:
             print("Exiting public user menu.")
-            return encrypted_message
+            if encrypted_message is not None:
+                return encrypted_message
+            else:
+                return None
         else:
             print("Invalid option. Please try again.")
 
@@ -162,7 +165,10 @@ def handle_key_owner(private_key, encrypted_message):
         elif owner_choice == 4:
             print ("Implementation has not been added")
         elif owner_choice == 5:
-            return (message, signature)
+            if message is not None and signature is not None:
+                return (message, signature)
+            else:
+                return None
 
             
 
