@@ -190,11 +190,15 @@ def handle_key_owner(private_key, public_key, encrypted_message, message, signat
             print(f"\nPublic Key: {public_key}")
             print(f"Private Key: {private_key}")
         elif owner_choice == 4:
-            print ("Generating new keys...")
-            public_key, private_key = generate_keys()
-            print(f"Public Key: {public_key}")
-            print(f"Private Key: {private_key}")
-            print("New keys generated!")
+            choice = input(("Generating new keys will delete all the encrypted messages sent, are you sure? (y/n)"))
+            choice = choice.lower()
+            if (choice == 'y'):
+                print ("Generating new keys...")
+                public_key, private_key = generate_keys()
+                print(f"Public Key: {public_key}")
+                print(f"Private Key: {private_key}")
+                print("New keys generated!")
+                encrypted_message = None
         elif owner_choice == 5:
            
             return (message, signature, public_key, private_key)
