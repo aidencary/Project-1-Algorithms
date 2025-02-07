@@ -59,14 +59,6 @@ The `generate_keys` function generates a pair of public and private keys. It sel
 - `handle_authenticate_signature(public_key, messages, signatures)`: Handles authenticating a digital signature for the public user.
 - `handle_generate_new_keys(private_key, public_key, messages, signatures)`: Handles generating new keys for the key owner.
 
-### Utility Functions
-- `convert_to_string(int_list)`: Converts a list of integers to a string, ensuring values are within the valid range for `chr()`.
-
 ## Main Loop
 - `main_loop(public_key, private_key, messages, signatures)`: Main loop to handle user input and menu options.
 - `main()`: Main function to run the RSA Cryptosystem.
-
-## Running the Program
-To run the program, execute the following command:
-```sh
-python RSA.py
