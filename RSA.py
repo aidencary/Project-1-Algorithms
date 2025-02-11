@@ -1,4 +1,4 @@
-# RSA Cyptosystem Project 1
+# RSA Cryptosystem Project 1
 # Aiden Cary, Nathan Wetherington, Dalton Gorham
 import math
 import random
@@ -27,12 +27,10 @@ def generate_prime(min, max):
 
 # Function to find an integer 'e' that is relatively prime to 'phi'
 def find_relatively_prime(phi):
-    # Start with a small number greater than 1
-    e = 2
-    # Keep increasing e until we find one that is coprime with phi
-    while math.gcd(e, phi) != 1:
-        e += 1
-    return e
+    while True:
+        e = random.randint(2, phi - 1)
+        if math.gcd(e, phi) == 1:
+            return e
 
 
 
