@@ -164,7 +164,9 @@ def handle_key_owner(private_key, public_key, messages, signatures):
         elif owner_choice == 3:
             show_keys(public_key, private_key)
         elif owner_choice == 4:
-            handle_generate_new_keys(private_key, public_key, messages, signatures)
+            new_public_key, new_private_key = handle_generate_new_keys(messages, signatures)
+            if new_public_key and new_private_key:
+                public_key, private_key = new_public_key, new_private_key
         elif owner_choice == 5:
             return (messages, signatures, public_key, private_key)
         else:
@@ -202,7 +204,7 @@ def show_keys(public_key, private_key):
 
 
 # helper function to generate new keys for the key owner
-def handle_generate_new_keys(private_key, public_key, messages, signatures):
+def handle_generate_new_keys(messages, signatures):
     choice = input(("Generating new keys will delete all the encrypted messages sent, are you sure? (y/n)"))
     choice = choice.lower()
     if (choice == 'y'):
@@ -211,6 +213,8 @@ def handle_generate_new_keys(private_key, public_key, messages, signatures):
         print("New keys generated!")
         messages.clear() # Clear the messages list after generating new keys
         signatures.clear() # Clear the signatures list after generating new keys
+        return public_key, private_key 
+    return None, None
 
 
 # helper function to sign a message for the key owner
